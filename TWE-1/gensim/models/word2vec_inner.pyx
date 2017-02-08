@@ -17,7 +17,12 @@ from libc.string cimport memset
 cdef extern from "voidptr.h":
     void* PyCObject_AsVoidPtr(object obj)
 
-from scipy.linalg.blas import fblas
+try:
+    from scipy.linalg.blas import fblas
+except ImportError:
+    # in scipy > 0.15, fblas function has been removed
+    import scipy.linalg.blas as fblas
+
 
 REAL = np.float32
 ctypedef np.float32_t REAL_t
@@ -885,7 +890,7 @@ def train_sentence_topic(model, sentence, alpha, _work):
                     continue
                 if hs:
                     fast_sentence_topic(points[i], codes[i], codelens[i], syn0, syn1, syn0_topic, size, topic[j], _alpha, work)
-                
+
                 if negative:
                     next_random = fast_sentence_sg_neg(negative, table, table_len, syn0, syn1neg, size, indexes[i], indexes[j], _alpha, work, next_random)
 
